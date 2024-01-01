@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                if (u.NewValue?.IsSupporter != true)
+                if (u.NewValue?.IsSupporter != false)
                     backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
                 else
                     backgroundSourceDropdown.ClearNoticeText();

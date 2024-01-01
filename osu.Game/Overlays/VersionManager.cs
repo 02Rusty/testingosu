@@ -64,20 +64,7 @@ namespace osu.Game.Overlays
             {
                 mainFill.AddRange(new Drawable[]
                 {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Font = OsuFont.Numeric.With(size: 12),
-                        Colour = colours.Yellow,
-                        Text = @"Development Build"
-                    },
-                    new Sprite
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Texture = textures.Get(@"Menu/dev-build-footer"),
-                    },
+                    new OsuSpriteText{Anchor = Anchor.TopCentre,Origin = Anchor.TopCentre,Font = OsuFont.Numeric.With(size: 12),Colour = colours.Yellow,Text = @"hi"},
                 });
             }
         }

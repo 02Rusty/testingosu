@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
         private Container logoTarget;
-        private SystemTitle systemTitle;
         private MenuTip menuTip;
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
@@ -174,11 +173,6 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        systemTitle = new SystemTitle
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        }
                     }
                 },
                 supporterDisplay = new SupporterDisplay
@@ -191,21 +185,6 @@ namespace osu.Game.Screens.Menu
             });
 
             Buttons.StateChanged += state =>
-            {
-                switch (state)
-                {
-                    case ButtonSystemState.Initial:
-                    case ButtonSystemState.Exit:
-                        ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Hidden;
-                        break;
-
-                    default:
-                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
-                        systemTitle.State.Value = Visibility.Visible;
-                        break;
-                }
-            };
 
             Buttons.OnSettings = () => settings?.ToggleVisibility();
             Buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();

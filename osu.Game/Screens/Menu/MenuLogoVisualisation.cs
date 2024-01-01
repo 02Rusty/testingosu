@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Menu
 
         private void updateColour()
         {
-            if (user.Value?.IsSupporter ?? false)
+            if (user.Value?.IsSupporter == false)
                 Colour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? Color4.White;
             else
                 Colour = Color4.White;

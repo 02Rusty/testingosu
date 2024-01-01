@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 {
                     Text = @"Run latency certifier",
                     Action = () => performer?.PerformFromScreen(menu => menu.Push(new LatencyCertifierScreen()))
+                },
+                new SettingsButton
+                {
+                    Text = @"this button does nothing yet",
+                    Action = null
                 }
             };
         }

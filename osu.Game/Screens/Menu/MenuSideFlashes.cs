@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Menu
         {
             Color4 baseColour = colours.Blue;
 
-            if (user.Value?.IsSupporter ?? false)
+            if (user.Value?.IsSupporter == false)
                 baseColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? baseColour;
 
             // linear colour looks better in this case, so let's use it for now.

@@ -1487,12 +1487,12 @@ namespace osu.Game
             {
                 case IntroScreen intro:
                     introScreen = intro;
-                    versionManager?.Show();
+                    versionManager?.Hide();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
-                    versionManager?.Show();
+                    versionManager?.Hide();
                     break;
 
                 default:

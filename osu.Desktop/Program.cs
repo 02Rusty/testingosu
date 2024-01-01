@@ -20,7 +20,7 @@ namespace osu.Desktop
     public static class Program
     {
 #if DEBUG
-        private const string base_game_name = @"osu-development";
+        private const string base_game_name = @"osu-dev-build";
 #else
         private const string base_game_name = @"osu";
 #endif

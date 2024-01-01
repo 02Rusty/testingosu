@@ -116,7 +116,7 @@ namespace osu.Desktop
             }
             else
             {
-                presence.State = "Idle";
+                presence.State = "IDLE_PRESENCE_STATUS";
                 presence.Details = string.Empty;
             }
 
