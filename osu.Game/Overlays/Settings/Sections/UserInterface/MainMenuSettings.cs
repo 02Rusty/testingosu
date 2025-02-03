@@ -3,11 +3,13 @@
 
 #nullable disable
 
+using System.Reflection.Emit;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -29,6 +31,15 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             Children = new Drawable[]
             {
+                new SettingsButton
+                {
+                    Text = ("balls")
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.Triangles,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowTriangles)
+                },
                 new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.ShowMenuTips,
