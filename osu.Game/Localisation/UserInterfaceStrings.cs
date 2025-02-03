@@ -8,7 +8,7 @@ namespace osu.Game.Localisation
     public static class UserInterfaceStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.UserInterface";
-
+        public static LocalisableString Triangles => new TranslatableString(getKey(@"triangles"), @"Triangles");
         /// <summary>
         /// "User Interface"
         /// </summary>
