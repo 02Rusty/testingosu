@@ -38,6 +38,9 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
+
+
+            SetDefault(OsuSetting.ShowTriangles, false); // Default value is TRUE (triangles enabled)
             SetDefault(OsuSetting.Ruleset, string.Empty);
             SetDefault(OsuSetting.Skin, SkinInfo.ARGON_SKIN.ToString());
 
@@ -336,6 +339,7 @@ namespace osu.Game.Configuration
     public enum OsuSetting
     {
         Ruleset,
+        ShowTriangles,
         Token,
         MenuCursorSize,
         GameplayCursorSize,
