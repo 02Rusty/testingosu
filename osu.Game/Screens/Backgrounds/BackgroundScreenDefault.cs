@@ -3,9 +3,13 @@
 
 #nullable disable
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
+using JetBrains.Annotations;
+using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -13,9 +17,11 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
@@ -29,10 +35,17 @@ namespace osu.Game.Screens.Backgrounds
         private int currentDisplay;
         private const int background_count = 8;
         private IBindable<APIUser> user;
+        private Bindable<bool> showTriangles;
+        private Track currentTrack;
+
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> source;
         private Bindable<IntroSequence> introSequence;
         private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
+
+        protected TrianglesV2? Triangles;
+
+        private TrianglesV2 triangles;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -42,20 +55,61 @@ namespace osu.Game.Screens.Backgrounds
 
         protected virtual bool AllowStoryboardBackground => true;
 
+        public Background Children { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {
+            currentTrack = beatmap?.Value?.Track;
+
+            if (currentTrack == null)
+
+                Logger.Log("Warning: No track found in current beatmap!", LoggingTarget.Runtime, LogLevel.Error);
+
+            // LEAVE OTHER DEPENDECIES ALONE!
+
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
             source = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
             AddInternal(seasonalBackgroundLoader);
+
+            // Ensure showTriangles is assigned before using it
+            showTriangles = config.GetBindable<bool>(OsuSetting.ShowTriangles);
+
+            // Ensure the Bindable is not null before calling BindValueChanged
+            if (showTriangles == null)
+            {
+                return;
+            }
+            showTriangles.BindValueChanged(enabled =>
+            {
+                if (Triangles != null)
+                    Triangles.Alpha = enabled.NewValue ? 1 : 0; // Show or hide triangles
+            }, true);
         }
+
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+
+    // Initialize triangles only if it hasn't been done yet
+    if (triangles == null)
+    {
+        triangles = new TrianglesV2
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            ScaleAdjust = 1.7f,
+            SpawnRatio = 4.2f,
+        };
+
+               // Add it to the screen
+             AddInternal(triangles);
 
             user.ValueChanged += _ => Scheduler.AddOnce(next);
             skin.ValueChanged += _ => Scheduler.AddOnce(next);
@@ -63,14 +117,37 @@ namespace osu.Game.Screens.Backgrounds
             beatmap.ValueChanged += _ => Scheduler.AddOnce(next);
             introSequence.ValueChanged += _ => Scheduler.AddOnce(next);
             seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(next);
-
             currentDisplay = RNG.Next(0, background_count);
             Next();
 
             // helper function required for AddOnce usage.
             void next() => Next();
         }
+        }
 
+protected override void Update()
+{
+    base.Update();
+
+    if (Triangles == null || currentTrack == null || !currentTrack.IsRunning || !showTriangles.Value)
+        return;
+
+    // Get the beat amplitude
+    float amplitude = currentTrack.CurrentAmplitudes.Average;
+
+    // If amplitude is too small, skip updates
+    if (amplitude < 0.01f)
+        return;
+
+    // Scale the triangles based on the beat
+    Triangles.Scale = new osuTK.Vector2(amplitude * 4);
+
+    // Move triangles upwards dynamically
+    Triangles.Position = new osuTK.Vector2(amplitude * 150);
+
+    // Change transparency dynamically
+    Triangles.Alpha = 0.5f + amplitude * 0.5f;
+}
         private ScheduledDelegate storyboardUnloadDelegate;
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -136,15 +213,18 @@ namespace osu.Game.Screens.Backgrounds
 
             AddInternal(background = newBackground);
             currentDisplay++;
+
         }
+
 
         private Background createBackground()
         {
             // seasonal background loading gets highest priority.
             Background newBackground = seasonalBackgroundLoader.LoadNextBackground();
 
-            if (newBackground == null && user.Value?.IsSupporter == true)
+            if (newBackground == null)
             {
+
                 switch (source.Value)
                 {
                     case BackgroundSource.Beatmap:
@@ -184,6 +264,7 @@ namespace osu.Game.Screens.Backgrounds
             newBackground.Depth = currentDisplay;
 
             return newBackground;
+
         }
 
         private string getBackgroundTextureName()
